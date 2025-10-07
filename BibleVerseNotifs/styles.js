@@ -1,11 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 export const GlobalStyles = StyleSheet.create({
-  keyboardAvoiding: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-  },
   container: {
     flex: 1, 
     alignItems: 'center',
@@ -86,6 +81,12 @@ export const GlobalStyles = StyleSheet.create({
   intervalContainer: {
     marginBottom: 20,
     tintColor: '#5b84b1'
+  },
+  overnightContainer: {
+    flexDirection: 'row',
+  },
+  overnightLabel: {
+    color: '#fff',
   },
 
 });

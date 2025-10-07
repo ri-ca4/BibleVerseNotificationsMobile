@@ -15,7 +15,7 @@ import Slider from '@react-native-community/slider';
 import { GlobalStyles } from './styles';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-
+import Checkbox from "expo-checkbox";
 
 const TOP_TRANSLATIONS =[
   {label: 'King James Version (KJV)',
@@ -38,6 +38,7 @@ const TOP_TRANSLATIONS =[
 export default function App() {
   const [selectedTranslation, setSelectedTranslation] = useState('KJV');
   const [notificationCount, setNotificationCount] = useState(1);
+  const [overnight, setOvernight] = useState(false);
   const [startTimeHour, setStartTimeHour] = useState('00');
   const [startTimeMin, setStartTimeMin] = useState('00');
   const [startTimeString, setStartTimeString] = useState('00:00');
@@ -50,15 +51,18 @@ export default function App() {
   const [endIsSet, setEndIsSet] = useState(false);
   const [saveErrorMessage, setSaveErrorMessage] = useState('');
   const [intervalMode, setIntervalMode] = useState('random');
+  
 
   const handleStartHourChange = (text) => {
     setStartTimeHour(text);
     setStartIsSet(false);
+    setEndIsSet(false);
   }
 
   const handleStartMinChange = (text) => {
     setStartTimeMin(text);
     setStartIsSet(false);
+    setEndIsSet(false);
   }
 
   const handleEndHourChange = (text) => {
@@ -70,6 +74,33 @@ export default function App() {
     setEndTimeMin(text);
     setEndIsSet(false);
   }
+
+  const handleOvernightChange = (newValue) => {
+    setOvernight(newValue);
+
+    const startHourNum = Number(startTimeHour);
+    const startMinNum = Number(startTimeMin);
+    const endHourNum = Number(endTimeHour);
+    const endMinNum = Number(endTimeMin);
+
+    if (newValue === false && endIsSet) {
+
+
+      if(endHourNum < startHourNum ||
+        (endHourNum === startHourNum && endMinNum <= startMinNum)){
+          setEndErrorMessage('Overnight option removed. Please re-set time.');
+          setEndIsSet(false);
+          setStartIsSet(false);
+      }
+    }
+
+    if (newValue === true) {
+      if(endHourNum < startHourNum ||
+        (endHourNum === startHourNum && endMinNum <= startMinNum)){
+          setEndErrorMessage('');
+    }
+  }
+}
 
   const handleSetStart = () => {
     setEndErrorMessage('');
@@ -111,8 +142,14 @@ export default function App() {
 
     if (endHourNum < startHourNum ||
         (endHourNum === startHourNum && endMinNum <= startMinNum)) {
-          setEndErrorMessage('End time must be after start time');
-          return;
+          if (overnight){
+            setEndErrorMessage('');
+            setEndIsSet(true);
+            return;
+          }else{
+            setEndErrorMessage('End time must be after start time');
+            return;
+          }
         };
 
     setEndErrorMessage('');
@@ -191,6 +228,13 @@ export default function App() {
               <Text style={GlobalStyles.countText}>
                 {notificationCount}
               </Text>
+            </View>
+            <View style={GlobalStyles.overnightContainer}>
+            <Checkbox
+              value={overnight}
+              onValueChange={handleOvernightChange}
+            />
+            <Text style={GlobalStyles.overnightLabel}>Schedule Overnight</Text>
             </View>
             <Text style={GlobalStyles.label}>
               Notification Window Start (HH:MM):
